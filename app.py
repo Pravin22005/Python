@@ -17,7 +17,7 @@ app.add_middleware(
         origin.strip()
         for origin in os.getenv(
             "ALLOWED_ORIGINS",
-            "http://localhost:8000,http://127.0.0.1:8000",
+            "http://localhost:8000,http://127.0.0.1:8000,https://pravin22kumar.github.io",
         ).split(",")
         if origin.strip()
     ],
