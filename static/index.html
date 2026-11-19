@@ -5,31 +5,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Python Playground</title>
   <style>
-    :root { color-scheme: dark; --bg:#0d1117; --panel:#161b22; --border:#30363d; --text:#e6edf3; --muted:#8b949e }
+    :root { color-scheme: dark; --bg:#090d14; --panel:#111827; --panel-2:#172033; --border:#263246; --text:#f4f7fb; --muted:#91a0b5; --accent:#68e0a0; --blue:#83b8ff }
     * { box-sizing:border-box }
-    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font:14px/1.5 system-ui,sans-serif }
-    header { height:58px; display:flex; align-items:center; justify-content:space-between; padding:0 20px; border-bottom:1px solid var(--border); background:#010409 }
-    h1 { margin:0; font-size:18px } h1 span { color:#ffd43b }
-    button { height:36px; border:1px solid var(--border); border-radius:6px; background:#21262d; color:var(--text); padding:0 12px; cursor:pointer }
-    button.primary { background:#238636; border-color:#2ea043; font-weight:600 }
-    main { display:grid; grid-template-columns:220px 1fr; height:calc(100vh - 58px) }
-    aside { border-right:1px solid var(--border); background:var(--panel); overflow:auto }
-    aside h2 { margin:0; padding:14px 16px 8px; color:var(--muted); font-size:12px; text-transform:uppercase }
+    body { margin:0; min-height:100vh; overflow-x:hidden; background:radial-gradient(circle at 75% -15%,#1e3854 0,transparent 38%),var(--bg); color:var(--text); font:14px/1.5 system-ui,sans-serif }
+    header { min-height:74px; display:flex; align-items:center; justify-content:space-between; gap:18px; padding:12px 28px; border-bottom:1px solid var(--border); background:rgba(6,10,17,.86); backdrop-filter:blur(14px) }
+    h1 { margin:0; font-size:20px; letter-spacing:-.02em } h1 span { color:#ffd43b; margin-right:7px }
+    .subtitle { color:var(--muted); font-size:12px; margin-top:2px }
+    .actions { display:flex; align-items:center; gap:9px; flex-wrap:wrap; justify-content:flex-end }
+    button { height:38px; border:1px solid var(--border); border-radius:9px; background:var(--panel-2); color:var(--text); padding:0 14px; cursor:pointer; transition:.18s ease; font-weight:600 }
+    button:hover { transform:translateY(-1px); border-color:#4b607d; background:#22304a } button:disabled { opacity:.55; cursor:wait; transform:none }
+    button.primary { background:#16955f; border-color:#43d08e; box-shadow:0 0 22px #16955f44 } button.primary:hover { background:#1cae70 }
+    main { display:grid; grid-template-columns:260px minmax(0,1fr); height:calc(100vh - 74px); min-height:560px }
+    aside { border-right:1px solid var(--border); background:rgba(17,24,39,.84); overflow:auto; padding:10px 12px }
+    aside h2 { margin:0; padding:14px 10px 8px; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.1em }
     #files { list-style:none; margin:0; padding:6px }
-    #files button { width:100%; height:auto; text-align:left; border:0; background:transparent; padding:8px 10px }
-    #files button.active { background:#30363d }
-    .work { display:grid; grid-template-rows:minmax(300px,1fr) 220px; min-width:0 }
-    .editor-head,.output-head { height:53px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); padding:8px 12px; background:var(--panel) }
+    #files button { width:100%; height:auto; text-align:left; border:0; background:transparent; padding:10px; font-weight:500; color:#c8d3e3 }
+    #files button.active { background:#28425b; color:white; box-shadow:inset 3px 0 var(--accent) }
+    .work { display:grid; grid-template-rows:minmax(300px,1fr) 230px; min-width:0; padding:18px; gap:14px }
+    .editor-panel,.output-panel { overflow:hidden; border:1px solid var(--border); border-radius:13px; background:#0d141f; box-shadow:0 12px 40px #0003 }
+    .editor-head,.output-head { height:51px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); padding:0 16px; background:linear-gradient(90deg,var(--panel),#121d2d) }
     #filename,#status { color:var(--muted); font-size:12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace }
-    textarea { width:100%; height:calc(100% - 53px); resize:none; border:0; outline:0; padding:18px; background:#0d1117; color:#e6edf3; font:15px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace; tab-size:4 }
-    pre { margin:0; height:167px; overflow:auto; padding:14px 18px; white-space:pre-wrap; color:#b6e3ff; font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace }
-    #saveResult { margin-left:8px }
+    textarea { width:100%; height:calc(100% - 51px); resize:none; border:0; outline:0; padding:20px; background:#0a1019; color:#e6edf3; font:15px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace; tab-size:4 }
+    pre { margin:0; height:177px; overflow:auto; padding:16px 18px; white-space:pre-wrap; color:#b6e3ff; font:14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace }
+    @media (max-width:1100px) and (min-width:761px) { header { padding-inline:20px } .work { padding:14px; grid-template-rows:minmax(300px,1fr) 210px } }
+    @media (max-width:760px) {
+      header { padding:14px 16px; align-items:stretch; flex-direction:column; gap:12px }
+      h1 { font-size:18px } .subtitle { max-width:42ch; line-height:1.35 }
+      .actions { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; justify-content:stretch }
+      .actions button { width:100%; padding-inline:6px; font-size:12px }
+      main { grid-template-columns:1fr; height:auto; min-height:0 }
+      aside { border-right:0; border-bottom:1px solid var(--border); max-height:168px; padding:6px 10px }
+      aside h2 { padding:8px 6px 4px }
+      #files { display:flex; gap:6px; overflow-x:auto; padding:4px 0 8px; scrollbar-width:thin }
+      #files li { flex:0 0 auto } #files button { width:auto; white-space:nowrap; padding:8px 11px; border:1px solid var(--border); border-radius:8px }
+      #files button.active { border-color:var(--accent) }
+      .work { display:grid; grid-template-rows:minmax(390px,58vh) 220px; padding:10px; gap:10px; min-height:0 }
+      .editor-head,.output-head { padding-inline:12px }
+      textarea { padding:15px; font-size:13px; line-height:1.55 }
+      pre { padding:13px 14px; font-size:12px; height:167px }
+    }
+    @media (max-width:420px) {
+      .actions button { font-size:11px } .work { grid-template-rows:minmax(360px,55vh) 205px }
+      #filename,#status { max-width:48%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1><span>&gt;_</span> Python Playground</h1>
-    <div>
+    <div><h1><span>&gt;_</span> Python Playground</h1><div class="subtitle">Edit, run, download, and submit Python safely through a pull request</div></div>
+    <div class="actions">
       <button id="download">Download</button>
       <button id="save">Save as PR</button>
       <button id="run" class="primary">Run Python</button>
@@ -38,18 +62,18 @@
   <main>
     <aside><h2>Repository files</h2><ul id="files"></ul></aside>
     <section class="work">
-      <div>
+      <div class="editor-panel">
         <div class="editor-head"><span id="filename">hello.py</span><span id="status">Loading...</span></div>
         <textarea id="editor" spellcheck="false" aria-label="Python code"></textarea>
       </div>
-      <div>
+      <div class="output-panel">
         <div class="output-head"><strong>Output</strong><button id="clear">Clear</button></div>
         <pre id="output"></pre>
       </div>
     </section>
   </main>
   <script>
-    const API = localStorage.getItem('python-playground-api') || '';
+    const API = 'https://python-playground-api.onrender.com';
     const editor = document.querySelector('#editor');
     const output = document.querySelector('#output');
     const status = document.querySelector('#status');
@@ -85,10 +109,7 @@
     }
 
     async function runCode() {
-      if (!API) {
-        output.textContent = 'Set the API URL: localStorage.setItem("python-playground-api", "https://your-api.example")';
-        return;
-      }
+      document.querySelector('#run').disabled = true;
       output.textContent = '';
       status.textContent = 'Running...';
       try {
@@ -99,18 +120,14 @@
         });
         const result = await response.json();
         output.textContent = (result.stdout || '') + (result.stderr || '');
-        status.textContent = response.ok ? `Exit code: ${result.exit_code}` : 'Error';
+        status.textContent = response.ok ? (result.exit_code === 0 ? 'Completed successfully' : `Exited with code ${result.exit_code}`) : 'Request failed';
       } catch (error) {
         output.textContent = error.message;
-        status.textContent = 'Error';
-      }
+        status.textContent = 'Request failed';
+      } finally { document.querySelector('#run').disabled = false; }
     }
 
     async function savePullRequest() {
-      if (!API) {
-        alert('Set the API URL with localStorage.setItem("python-playground-api", "...")');
-        return;
-      }
       status.textContent = 'Creating pull request...';
       try {
         const response = await fetch(API + '/api/save', {
