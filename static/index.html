@@ -128,8 +128,17 @@
       return [...openFiles.values()].some(entry => !entry.deleted && entry.name !== except && fileKey(entry.name) === key);
     }
 
-    function checkRemoteFileName(name) {
-      return requestJson(`${API}/api/files/check?name=${encodeURIComponent(name)}`, {}, 'Filename check');
+    async function checkRemoteFileName(name) {
+      beginBusy('Checking filename...');
+      setStatus('Checking filename', true);
+      try {
+        return await requestJson(`${API}/api/files/check?name=${encodeURIComponent(name)}`, {}, 'Filename check');
+      } finally {
+        endBusy();
+        const entry = openFiles.get(activeFile);
+        if (entry) setStatus(entry.status, entry.status === 'Running...');
+        else setStatus('Ready');
+      }
     }
 
     function setStatus(message, loading = false) {
@@ -187,6 +196,7 @@
 
     function openModal({ title, message = '', input = false, value = '', confirmText = 'OK', cancelText = 'Cancel', showCancel = true }) {
       return new Promise(resolve => {
+        let settled = false;
         modalTitle.textContent = title;
         modalMessage.textContent = message;
         modalInput.hidden = !input;
@@ -194,9 +204,9 @@
         modalCancel.hidden = !showCancel;
         modalCancel.textContent = cancelText;
         modalConfirm.textContent = confirmText;
-        modalBackdrop.hidden = false;
-        if (input) { modalInput.focus(); modalInput.select(); } else modalConfirm.focus();
         const close = result => {
+          if (settled) return;
+          settled = true;
           modalBackdrop.hidden = true;
           modalCancel.onclick = null;
           modalConfirm.onclick = null;
@@ -206,9 +216,13 @@
         modalCancel.onclick = () => close(null);
         modalConfirm.onclick = () => close(input ? modalInput.value : true);
         modalInput.onkeydown = event => {
-          if (event.key === 'Enter') close(modalInput.value);
-          if (event.key === 'Escape') close(null);
+          if (event.key === 'Enter') { event.preventDefault(); event.stopPropagation(); close(modalInput.value); }
+          if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(null); }
         };
+        modalBackdrop.hidden = false;
+        requestAnimationFrame(() => {
+          if (input) { modalInput.focus(); modalInput.select(); } else modalConfirm.focus();
+        });
       });
     }
 
@@ -278,13 +292,31 @@
       renderTabs();
     }
 
+    function clearActiveFile() {
+      activeFile = '';
+      editor.value = '';
+      output.textContent = '';
+      filename.textContent = 'No file';
+      document.querySelector('#crumb-file').textContent = 'No file';
+      lineNumbers.textContent = '';
+      outputFileButton.textContent = 'No file';
+      runButton.disabled = true;
+      hideSuggestions();
+      document.querySelectorAll('#files button').forEach(button => button.classList.remove('active'));
+      setStatus('No file open');
+      renderTabs();
+      renderOutputFiles(outputFileSearch.value);
+    }
+
     function closeFile(name) {
-      const names = [...openFiles.keys()];
+      const names = [...openFiles.values()].filter(entry => !entry.deleted).map(entry => entry.name);
       const index = names.indexOf(name);
       openFiles.delete(name);
-      if (activeFile === name) activeFile = names[index - 1] || names[index + 1] || '';
-      if (activeFile) syncActiveFile();
-      else { editor.value = ''; output.textContent = ''; outputFileButton.textContent = 'No file'; setStatus('No file open'); renderTabs(); renderOutputFiles(outputFileSearch.value); }
+      if (activeFile === name) {
+        activeFile = names[index - 1] || names[index + 1] || '';
+      }
+      if (activeFile && openFiles.has(activeFile)) syncActiveFile();
+      else clearActiveFile();
     }
 
     function renderExplorerFiles(files) {
@@ -352,7 +384,13 @@
       if (next === null || next.trim() === entry.name) return;
       const newName = next.trim();
       if (!/^[A-Za-z0-9_-]+\.py$/.test(newName)) return showNotice('Invalid filename', 'Use a simple Python filename ending in .py.');
-      const remoteName = await checkRemoteFileName(newName);
+      let remoteName;
+      try {
+        remoteName = await checkRemoteFileName(newName);
+      } catch (error) {
+        await showRetry('Filename check failed', error.message, () => renameFile(name));
+        return;
+      }
       if (!remoteName.allowed || remoteName.exists || fileExists(newName, entry.name) || HIDDEN_FILES.has(newName.toLowerCase())) return showNotice('File already exists', `${newName} is already in the workspace.`);
       openFiles.delete(name);
       entry.name = newName;
@@ -406,7 +444,13 @@
         await showNotice('Invalid filename', 'Use a simple Python filename ending in .py.');
         return;
       }
-      const remoteName = await checkRemoteFileName(name);
+      let remoteName;
+      try {
+        remoteName = await checkRemoteFileName(name);
+      } catch (error) {
+        await showRetry('Filename check failed', error.message, createNewFile);
+        return;
+      }
       if (!remoteName.allowed || remoteName.exists || fileExists(name) || HIDDEN_FILES.has(name.toLowerCase())) {
         await showNotice('File already exists', `${name} is already in the Explorer.`);
         return;
@@ -595,9 +639,12 @@
     }
 
     editor.addEventListener('keydown', event => {
-      if (!suggestions.hidden && event.key === 'ArrowDown') { event.preventDefault(); suggestionIndex = Math.min(suggestionIndex + 1, suggestions.children.length - 1); updateSuggestions(); return; }
-      if (!suggestions.hidden && event.key === 'ArrowUp') { event.preventDefault(); suggestionIndex = Math.max(suggestionIndex - 1, 0); updateSuggestions(); return; }
-      if (!suggestions.hidden && (event.key === 'Enter' || event.key === 'Tab')) { event.preventDefault(); const item = suggestions.children[suggestionIndex]; if (item) acceptSuggestion(item.firstChild.textContent); return; }
+      const key = event.key;
+      if ((event.ctrlKey || event.metaKey) && key === 'Enter') { event.preventDefault(); event.stopPropagation(); runCode(); return; }
+      if (!suggestions.hidden && key === 'ArrowDown') { event.preventDefault(); event.stopPropagation(); suggestionIndex = Math.min(suggestionIndex + 1, suggestions.children.length - 1); updateSuggestions(); return; }
+      if (!suggestions.hidden && key === 'ArrowUp') { event.preventDefault(); event.stopPropagation(); suggestionIndex = Math.max(suggestionIndex - 1, 0); updateSuggestions(); return; }
+      if (!suggestions.hidden && (key === 'Enter' || key === 'Tab')) { event.preventDefault(); event.stopPropagation(); const item = suggestions.children[suggestionIndex]; if (item) acceptSuggestion(item.querySelector('span')?.textContent || item.textContent); return; }
+      if (!suggestions.hidden && key === 'Escape') { event.preventDefault(); event.stopPropagation(); hideSuggestions(); return; }
       if (event.key === 'Tab') {
         event.preventDefault();
         const lineStart = editor.value.lastIndexOf('\n', editor.selectionStart - 1) + 1;
@@ -633,7 +680,6 @@
         hideSuggestions();
         return;
       }
-      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') runCode();
     });
     editor.addEventListener('input', () => {
       const entry = openFiles.get(activeFile);

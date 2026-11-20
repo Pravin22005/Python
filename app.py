@@ -143,6 +143,7 @@ def save_as_pull_request(request: SaveRequest):
         raise HTTPException(503, "GITHUB_TOKEN is not configured")
 
     import base64
+    import json
     import secrets
     import urllib.error
     import urllib.parse
@@ -173,6 +174,8 @@ def save_as_pull_request(request: SaveRequest):
         except urllib.error.HTTPError as error:
             detail = error.read().decode("utf-8", "replace")
             raise HTTPException(error.code, f"GitHub API error: {detail}")
+        except urllib.error.URLError as error:
+            raise HTTPException(502, f"GitHub API is unavailable: {error.reason}")
 
     def github_optional_json(method, url, payload=None):
         data = json_bytes(payload)
@@ -186,6 +189,8 @@ def save_as_pull_request(request: SaveRequest):
                 return {}
             detail = error.read().decode("utf-8", "replace")
             raise HTTPException(error.code, f"GitHub API error: {detail}")
+        except urllib.error.URLError as error:
+            raise HTTPException(502, f"GitHub API is unavailable: {error.reason}")
 
     def json_bytes(payload):
         import json
