@@ -45,21 +45,27 @@ def list_repository_files(search: str = ""):
 
     owner = os.getenv("GITHUB_OWNER", "pravin22kumar")
     repo = os.getenv("GITHUB_REPO", "Python")
+    token = os.getenv("GITHUB_TOKEN")
     url = f"https://api.github.com/repos/{owner}/{repo}/contents"
-    request = urllib.request.Request(
-        url,
-        headers={
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "python-playground",
-        },
-    )
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "python-playground",
+    }
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(request, timeout=10) as response:
             items = json.loads(response.read())
     except urllib.error.HTTPError as error:
-        raise HTTPException(error.code, "Could not load repository files")
-    except urllib.error.URLError:
-        raise HTTPException(503, "Repository file service is unavailable")
+        try:
+            detail = json.loads(error.read().decode("utf-8", "replace"))
+            message = detail.get("message", "Could not load repository files")
+        except (ValueError, UnicodeDecodeError):
+            message = "Could not load repository files"
+        raise HTTPException(error.code, f"GitHub repository files: {message}")
+    except urllib.error.URLError as error:
+        raise HTTPException(503, f"Repository file service is unavailable: {error.reason}")
 
     query = search.strip().lower()
     return [
