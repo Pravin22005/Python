@@ -2,6 +2,10 @@ import os
 import subprocess
 import sys
 import tempfile
+import ast
+import base64
+import json
+import urllib.parse
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -94,6 +98,12 @@ def check_file_name(name: str):
 
 class RunRequest(BaseModel):
     code: str
+    stdin: str = ""
+    timeout: int = Field(default=5, ge=1, le=30)
+    memory_mb: int = Field(default=128, ge=32, le=512)
+    network_disabled: bool = True
+    test_framework: str = "none"
+    dependencies: list[str] = Field(default_factory=list)
 
 
 class SaveRequest(BaseModel):
@@ -114,16 +124,67 @@ def run_code(request: RunRequest):
     if len(request.code) > 50_000:
         raise HTTPException(400, "Code exceeds the 50 KB limit")
 
+    if len(request.stdin) > 10_000:
+        raise HTTPException(400, "Standard input exceeds the 10 KB limit")
+    if request.test_framework not in {"none", "unittest", "pytest"}:
+        raise HTTPException(400, "Unsupported test framework")
+
+    allowed_dependencies = {
+        item.strip().lower()
+        for item in os.getenv("ALLOWED_PACKAGES", "").split(",")
+        if item.strip()
+    }
+    unknown_dependencies = sorted({
+        dependency.lower()
+        for dependency in request.dependencies
+        if dependency.lower() not in allowed_dependencies
+    })
+    if unknown_dependencies:
+        raise HTTPException(
+            400,
+            "Dependencies are not allowlisted: " + ", ".join(unknown_dependencies),
+        )
+
     with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as source:
+        bootstrap = ""
+        if request.network_disabled:
+            bootstrap = (
+                "import sys\n"
+                "def _block_network(event, args):\n"
+                "    if event.startswith('socket.'):\n"
+                "        raise PermissionError('Network access is disabled for this run')\n"
+                "sys.addaudithook(_block_network)\n"
+            )
+        bootstrap += (
+            "import resource\n"
+            f"_limit = {request.memory_mb} * 1024 * 1024\n"
+            "try:\n"
+            "    resource.setrlimit(resource.RLIMIT_AS, (_limit, _limit))\n"
+            "except (AttributeError, ValueError, OSError):\n"
+            "    pass\n"
+        )
+        source.write(bootstrap)
         source.write(request.code)
+        if request.test_framework == "unittest":
+            source.write(
+                "\n\nimport unittest\n"
+                "_suite = unittest.defaultTestLoader.loadTestsFromModule("
+                "sys.modules[__name__])\n"
+                "_result = unittest.TextTestRunner().run(_suite)\n"
+                "raise SystemExit(0 if _result.wasSuccessful() else 1)\n"
+            )
         source_path = source.name
 
     try:
+        argv = [sys.executable, "-I", "-B", source_path]
+        if request.test_framework == "pytest":
+            argv = [sys.executable, "-I", "-B", "-m", "pytest", "-q", source_path]
         result = subprocess.run(
-            [sys.executable, "-I", "-B", source_path],
+            argv,
             capture_output=True,
             text=True,
-            timeout=5,
+            input=request.stdin,
+            timeout=request.timeout,
             cwd=tempfile.gettempdir(),
             env={
                 "PATH": os.environ.get("PATH", ""),
@@ -137,9 +198,45 @@ def run_code(request: RunRequest):
             "exit_code": result.returncode,
         }
     except subprocess.TimeoutExpired:
-        return {"stdout": "", "stderr": "Execution timed out after 5 seconds.", "exit_code": 124}
+        return {
+            "stdout": "",
+            "stderr": f"Execution timed out after {request.timeout} seconds.",
+            "exit_code": 124,
+        }
     finally:
         os.unlink(source_path)
+
+
+@app.post("/api/lint")
+def lint_code(request: RunRequest):
+    if len(request.code) > 50_000:
+        raise HTTPException(400, "Code exceeds the 50 KB limit")
+    try:
+        ast.parse(request.code)
+    except SyntaxError as error:
+        return {
+            "valid": False,
+            "errors": [{
+                "line": error.lineno or 1,
+                "column": (error.offset or 1),
+                "message": error.msg,
+            }],
+        }
+    return {"valid": True, "errors": []}
+
+
+@app.post("/api/format")
+def format_code(request: RunRequest):
+    if len(request.code) > 50_000:
+        raise HTTPException(400, "Code exceeds the 50 KB limit")
+    try:
+        tree = ast.parse(request.code)
+    except SyntaxError as error:
+        raise HTTPException(
+            400,
+            f"Syntax error on line {error.lineno or 1}: {error.msg}",
+        )
+    return {"code": ast.unparse(tree)}
 
 
 @app.post("/api/save")
