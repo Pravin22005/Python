@@ -18,6 +18,7 @@
     .brand { display:flex; align-items:center; gap:9px; min-width:195px; color:var(--text) }.brand-mark { color:#22a7f0; font-size:18px; font-weight:700 }.brand strong { font-size:13px; font-weight:600 }.brand small { color:var(--muted); font-size:11px }
     .breadcrumbs { color:var(--muted); font-size:12px; white-space:nowrap }.breadcrumbs b { color:var(--text); font-weight:500 }.top-actions { display:flex; align-items:center; gap:7px; margin-left:auto }
     .top-actions button,.theme-button { height:28px; padding:0 10px; border:1px solid var(--border); border-radius:4px; background:var(--hover-surface); color:var(--text) }.top-actions button:hover,.theme-button:hover { background:var(--active-surface) }.top-actions .primary { background:#168b58; border-color:#21a366; color:#fff }.top-actions .primary:hover { background:#1aa365 }
+    .execution-options { display:flex; align-items:center; gap:5px }.execution-options select,.execution-options input { height:28px; border:1px solid var(--border); border-radius:4px; background:var(--hover-surface); color:var(--text); padding:0 6px }.execution-options label { display:flex; align-items:center; gap:4px; color:var(--muted); font-size:11px }.execution-options input[type="checkbox"] { height:auto }.execution-options input[type="text"] { width:150px }.top-actions .tool-button { color:var(--muted) }#online-state { color:var(--green); font-size:11px }#online-state.offline { color:#f87171 }
     .theme-picker { position:relative }.theme-button { min-width:86px; text-align:left }.theme-button::after { content:''; display:inline-block; width:7px; height:7px; margin:0 0 3px 14px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg) }.theme-menu { position:absolute; z-index:8; top:34px; right:0; min-width:140px; padding:5px; border:1px solid var(--border); border-radius:5px; background:var(--sidebar); box-shadow:0 12px 30px #0008 }.theme-menu[hidden] { display:none }.theme-menu button { display:flex; align-items:center; justify-content:space-between; width:100%; height:30px; padding:0 9px; border:0; text-align:left; background:transparent; color:var(--text); border-radius:3px }.theme-menu button::after { content:''; width:6px; height:10px; border-right:2px solid transparent; border-bottom:2px solid transparent; transform:rotate(45deg) translateY(-2px) }.theme-menu button:hover:not(.active) { background:var(--hover-surface) }.theme-menu button.active { background:var(--blue); color:#fff }.theme-menu button.active::after { border-color:#fff }
     main { display:grid; grid-template-columns:var(--explorer-width,245px) 6px minmax(0,1fr); height:calc(100vh - 45px); min-height:500px }
     aside { overflow:auto; padding:16px 0; background:var(--sidebar); border-right:1px solid var(--border) }.explorer-title { display:flex; align-items:center; justify-content:space-between; padding:0 14px 10px; color:var(--muted); font-size:11px; letter-spacing:.08em }.explorer-title button { padding:2px 6px; color:var(--muted); background:transparent; font-size:17px; line-height:1 }.explorer-title button:hover { color:var(--text) }.file-search { width:calc(100% - 20px); height:28px; margin:0 10px 9px; padding:0 9px; border:1px solid var(--border); border-radius:4px; outline:0; background:var(--editor); color:var(--text); font:12px ui-monospace,monospace }.file-search:focus { border-color:var(--blue) }.folder { width:100%; padding:5px 14px; text-align:left; color:var(--text); background:transparent; font-size:12px; font-weight:600 }.folder:hover { background:var(--hover-surface) }.folder .arrow { display:inline-block; width:9px; height:9px; margin:0 8px 2px 2px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); transition:transform .15s }.folder.collapsed .arrow { transform:rotate(-45deg); margin-bottom:-2px }.resizer { z-index:3; background:var(--editor-2); cursor:col-resize }.resizer:hover { background:var(--blue) }
@@ -27,6 +28,7 @@
     .editor-panel { position:relative; min-height:0; overflow:hidden; background:var(--editor) }.editor-head { position:absolute; z-index:1; right:16px; top:9px; display:flex; gap:12px; align-items:center; pointer-events:none }.editor-head #filename { display:none } #status { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:11px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace }.inline-spinner { width:12px; height:12px; border:2px solid #ffffff35; border-top-color:var(--blue); border-radius:50%; animation:spin .75s linear infinite }.inline-spinner[hidden] { display:none }
     .line-numbers { position:absolute; inset:0 auto 0 0; z-index:2; width:48px; overflow:hidden; padding:18px 10px 18px 0; background:var(--editor-2); color:var(--muted); text-align:right; pointer-events:none; user-select:none; white-space:pre; font:14px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace }.editor-panel textarea { padding-left:60px }
     textarea { width:100%; height:100%; resize:none; border:0; outline:0; padding:18px 24px; background:var(--editor); color:var(--text); caret-color:var(--text); font:14px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace; tab-size:4; white-space:pre }
+    #syntax-preview { position:absolute; inset:0; margin:0; height:100%; overflow:auto; padding:18px 24px 18px 60px; background:var(--editor); color:var(--text); font:14px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace; white-space:pre-wrap }.syntax-keyword{color:#c586c0}.syntax-string{color:#ce9178}.syntax-comment{color:#6a9955}.syntax-number{color:#b5cea8}.syntax-built-in{color:#4fc1ff}
     .suggestions,.context-menu { position:absolute; z-index:8; overflow:auto; padding:5px; border:1px solid color-mix(in srgb, var(--border) 80%, white 20%); border-radius:7px; background:color-mix(in srgb, var(--sidebar) 82%, transparent); backdrop-filter:blur(16px) saturate(140%); -webkit-backdrop-filter:blur(16px) saturate(140%); box-shadow:0 16px 38px #0009; font:12px ui-monospace,monospace }.suggestions { top:42px; left:60px; width:220px; max-height:190px }.suggestions[hidden],.context-menu[hidden] { display:none }.suggestion { display:flex; justify-content:space-between; width:100%; padding:6px 8px; border-radius:3px; background:transparent; color:var(--text); text-align:left }.suggestion:hover,.suggestion.selected { background:var(--blue); color:#fff }.suggestion-type { color:var(--muted); font-size:10px }.suggestion:hover .suggestion-type,.suggestion.selected .suggestion-type { color:#fff }.context-menu { min-width:170px; padding:5px }.context-menu button { display:block; width:100%; padding:7px 9px; border-radius:4px; background:transparent; color:var(--text); text-align:left }.context-menu button:hover { background:var(--hover-surface) }.context-menu .danger { color:#f87171 }
     .output-panel { position:relative; z-index:20; min-height:0; overflow:visible; border-top:1px solid var(--border); background:var(--editor-2) }.output-head { position:relative; z-index:21; height:36px; display:flex; align-items:center; gap:10px; padding:0 16px; border-bottom:1px solid var(--border); color:var(--muted); font-size:12px }.output-head strong { color:var(--text); font-weight:500 }.output-file-picker { position:relative; z-index:22; margin-left:4px }.output-file-button { max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; padding:4px 8px; border:1px solid var(--border); border-radius:4px; background:var(--hover-surface); color:var(--text); font:11px ui-monospace,monospace }.output-file-button::after { content:''; display:inline-block; width:6px; height:6px; margin:0 0 2px 9px; border-right:1px solid currentColor; border-bottom:1px solid currentColor; transform:rotate(45deg) }.output-file-menu { position:absolute; bottom:30px; left:0; z-index:100; width:250px; max-height:260px; overflow:auto; padding:6px; border:1px solid var(--border); border-radius:7px; background:color-mix(in srgb, var(--sidebar) 84%, transparent); backdrop-filter:blur(16px) saturate(140%); -webkit-backdrop-filter:blur(16px) saturate(140%); box-shadow:0 16px 38px #0009 }.output-file-menu[hidden] { display:none }.output-file-search { width:100%; height:28px; margin-bottom:5px; padding:0 8px; border:1px solid var(--border); border-radius:4px; outline:0; background:var(--editor); color:var(--text); font:11px ui-monospace,monospace }.output-file-list button { display:flex; justify-content:space-between; width:100%; padding:7px 8px; border-radius:4px; background:transparent; color:var(--text); text-align:left; font:11px ui-monospace,monospace }.output-file-list button:hover { background:var(--hover-surface) }.output-file-list .run-file { color:var(--green); font-size:10px }.output-head > #clear { margin-left:auto; padding:3px 8px; border-radius:3px; background:var(--hover-surface); color:var(--muted); font-size:11px }.output-head > #clear:hover { color:var(--text); background:var(--active-surface) } pre { margin:0; height:174px; overflow:auto; padding:12px 17px; white-space:pre-wrap; color:var(--text); background:var(--editor-2); font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace }
     .modal-backdrop { position:fixed; inset:0; z-index:10; display:flex; align-items:center; justify-content:center; padding:20px; background:#0009 }.modal-backdrop[hidden] { display:none }.modal { width:min(480px,100%); padding:22px; border:1px solid color-mix(in srgb, var(--border) 80%, white 20%); border-radius:10px; background:color-mix(in srgb, var(--sidebar) 84%, transparent); backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%); color:var(--text); box-shadow:0 20px 70px #000b }.modal h2 { margin:0 0 8px; color:var(--text); font-size:16px; font-weight:600 }.modal p { margin:0 0 16px; color:var(--muted); font-size:13px; white-space:pre-line }.modal input { width:100%; height:36px; margin-bottom:18px; padding:0 10px; border:1px solid var(--border); border-radius:4px; outline:0; background:var(--editor); color:var(--text); font:13px ui-monospace,monospace }.modal input:focus { border-color:var(--blue); box-shadow:0 0 0 1px var(--blue) }.modal-actions { display:flex; justify-content:flex-end; gap:8px }.modal-actions button { padding:8px 14px; border-radius:4px; background:var(--hover-surface); color:var(--text) }.modal-actions button.primary { background:#0e639c; color:#fff }.modal-actions button:hover { filter:brightness(1.15) }
@@ -41,7 +43,22 @@
     <div class="brand"><span class="brand-mark">⌘</span><div><strong>Python Playground</strong><br><small>browser workspace</small></div></div>
     <div class="breadcrumbs">Python <span>›</span> <b id="crumb-file">hello.py</b></div>
     <div class="top-actions">
+      <span id="online-state">Online</span>
       <div class="theme-picker"><button id="theme-button" class="theme-button" aria-haspopup="true" aria-expanded="false">Dark</button><div id="theme-menu" class="theme-menu" hidden><button data-theme="dark">Dark</button><button data-theme="light">Light</button><button data-theme="dracula">Dracula</button><button data-theme="monokai">Monokai</button></div></div>
+      <div class="execution-options" title="Execution settings">
+        <select id="test-framework" aria-label="Test framework"><option value="none">Run</option><option value="unittest">unittest</option><option value="pytest">pytest</option></select>
+        <select id="timeout" aria-label="Execution timeout"><option value="5">5s</option><option value="10">10s</option><option value="20">20s</option><option value="30">30s</option></select>
+        <select id="memory" aria-label="Memory limit"><option value="128">128 MB</option><option value="256">256 MB</option><option value="512">512 MB</option></select>
+        <input id="stdin" type="text" placeholder="stdin input" title="Standard input">
+        <input id="dependencies" type="text" placeholder="allowed packages" title="Comma-separated allowlisted dependencies">
+        <label><input id="network-disabled" type="checkbox" checked> No network</label>
+      </div>
+      <button id="lint" class="tool-button">Lint</button>
+      <button id="format" class="tool-button">Format</button>
+      <button id="highlight" class="tool-button">Highlight</button>
+      <button id="find" class="tool-button">Find</button>
+      <button id="share" class="tool-button">Share</button>
+      <button id="copy-output" class="tool-button">Copy output</button>
       <button id="download">Download</button>
       <button id="save">Save as PR</button>
       <button id="run" class="primary">Run Python</button>
@@ -56,6 +73,7 @@
         <div class="editor-head"><span id="filename">hello.py</span><span id="status" title="Ready"><span id="status-spinner" class="inline-spinner" hidden></span><span id="status-text">Ready</span></span></div>
         <div id="line-numbers" class="line-numbers">1</div>
         <textarea id="editor" spellcheck="false" aria-label="Python code"></textarea>
+        <pre id="syntax-preview" hidden></pre>
         <div id="suggestions" class="suggestions" role="listbox" hidden></div>
       </div>
       <div id="output-resizer" class="panel-resizer" title="Resize Output"></div>
@@ -79,7 +97,9 @@
     <button data-action="close">Close Tab</button>
   </div>
   <script>
-    const API = 'https://python-playground-api.onrender.com';
+    const API = ['localhost', '127.0.0.1'].includes(location.hostname)
+      ? location.origin
+      : 'https://python-playground-api.onrender.com';
     const editor = document.querySelector('#editor');
     const output = document.querySelector('#output');
     const status = document.querySelector('#status');
@@ -276,6 +296,44 @@
       if (!outputFileList.children.length) outputFileList.innerHTML = '<div style="padding:8px;color:var(--muted)">No matching files</div>';
     }
 
+    function persistWorkspace() {
+      const entries = [...openFiles.values()].map(entry => ({
+        name: entry.name,
+        originalName: entry.originalName,
+        code: entry.code,
+        output: entry.output,
+        kind: entry.kind,
+        deleted: entry.deleted
+      }));
+      localStorage.setItem('python-playground-workspace', JSON.stringify({
+        entries,
+        activeFile
+      }));
+    }
+
+    function restoreWorkspace() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('python-playground-workspace') || 'null');
+        if (!saved || !Array.isArray(saved.entries)) return false;
+        openFiles.clear();
+        for (const item of saved.entries) {
+          const entry = fileState({ name: item.name }, true);
+          entry.originalName = item.originalName || item.name;
+          entry.code = item.code || '';
+          entry.output = item.output || '';
+          entry.loaded = true;
+          entry.kind = item.kind || 'unchanged';
+          entry.deleted = item.deleted || false;
+        }
+        activeFile = openFiles.has(saved.activeFile) ? saved.activeFile : [...openFiles.values()][0]?.name || '';
+        if (activeFile) syncActiveFile();
+        else clearActiveFile();
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
     function syncActiveFile() {
       const entry = openFiles.get(activeFile);
       if (!entry) return;
@@ -317,6 +375,7 @@
       }
       if (activeFile && openFiles.has(activeFile)) syncActiveFile();
       else clearActiveFile();
+      persistWorkspace();
     }
 
     function renderExplorerFiles(files) {
@@ -465,6 +524,27 @@
       await openFile(entry);
     }
 
+    function restoreSharedCode() {
+      if (!location.hash.startsWith('#code=')) return false;
+      try {
+        const encoded = decodeURIComponent(location.hash.slice(6));
+        const payload = JSON.parse(decodeURIComponent(escape(atob(encoded))));
+        if (!payload.name || typeof payload.code !== 'string') return false;
+        if (!/^[A-Za-z0-9_-]+\.py$/.test(payload.name)) return false;
+        const entry = fileState({ name: payload.name }, true);
+        entry.code = payload.code;
+        entry.loaded = true;
+        entry.status = 'Loaded from share link';
+        activeFile = entry.name;
+        syncActiveFile();
+        addFileToExplorer(entry.name);
+        persistWorkspace();
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
     async function loadFiles() {
       beginBusy('Loading repository files...');
       setStatus('Loading repository files', true);
@@ -472,7 +552,7 @@
         const files = await requestJson(API + '/api/files', {}, 'Repository files');
         repositoryFiles = files;
         renderExplorerFiles(files);
-        if (files.length) await openFile(files[0]);
+        if (!restoreSharedCode() && !restoreWorkspace() && files.length) await openFile(files[0]);
       } finally {
         endBusy();
       }
@@ -503,7 +583,18 @@
         const result = await requestJson(API + '/api/run', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: entry.code })
+          body: JSON.stringify({
+            code: entry.code,
+            stdin: document.querySelector('#stdin').value,
+            timeout: Number(document.querySelector('#timeout').value),
+            memory_mb: Number(document.querySelector('#memory').value),
+            network_disabled: document.querySelector('#network-disabled').checked,
+            test_framework: document.querySelector('#test-framework').value,
+            dependencies: document.querySelector('#dependencies').value
+              .split(',')
+              .map(value => value.trim())
+              .filter(Boolean)
+          })
         }, 'Python run');
         entry.output = ((result.stdout || '') + (result.stderr || '')).slice(0, MAX_OUTPUT_SIZE);
         entry.status = result.exit_code === 0 ? 'Completed successfully' : `Exited with code ${result.exit_code}`;
@@ -531,7 +622,11 @@
     async function reviewChanges(changes) {
       const labels = { added: 'A', modified: 'M', renamed: 'R', deleted: 'D' };
       const summary = changes.map(change => `${labels[change.type]}  ${change.type === 'renamed' ? `${change.previous_path} → ${change.path}` : change.path}`).join('\n');
-      return openModal({ title: 'Review changes before PR', message: summary, confirmText: 'Create PR' });
+      const previews = changes
+        .filter(change => change.type !== 'deleted')
+        .map(change => `--- ${change.path}\n+++ ${change.path}\n${(change.content || '').split('\n').slice(0, 40).map(line => `+ ${line}`).join('\n')}`)
+        .join('\n\n');
+      return openModal({ title: 'Review changes before PR', message: `${summary}\n\nUnified diff preview:\n${previews}`, confirmText: 'Create PR' });
     }
 
     async function savePullRequest() {
@@ -558,6 +653,103 @@
         endBusy();
       }
     }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      }[character]));
+    }
+
+    function highlightPython(code) {
+      const keywords = new Set(['and','as','assert','break','class','continue','def','del','elif','else','except','False','finally','for','from','global','if','import','in','is','lambda','None','nonlocal','not','or','pass','raise','return','True','try','while','with','yield']);
+      const builtIns = new Set(['print','range','len','input','list','dict','set','tuple','str','int','float','bool','open','sum','enumerate','zip','min','max']);
+      const pattern = /("(?:[^"\\\\]|\\\\.)*"|'(?:[^'\\\\]|\\\\.)*'|#[^\n]*|\b\d+(?:\.\d+)?\b|\b[A-Za-z_][A-Za-z0-9_]*\b)/g;
+      return code.split(pattern).map((part, index) => {
+        if (index % 2 === 0) return escapeHtml(part);
+        const escaped = escapeHtml(part);
+        if (part.startsWith('"') || part.startsWith("'")) return `<span class="syntax-string">${escaped}</span>`;
+        if (part.startsWith('#')) return `<span class="syntax-comment">${escaped}</span>`;
+        if (/^\d/.test(part)) return `<span class="syntax-number">${escaped}</span>`;
+        if (keywords.has(part)) return `<span class="syntax-keyword">${escaped}</span>`;
+        if (builtIns.has(part)) return `<span class="syntax-built-in">${escaped}</span>`;
+        return escaped;
+      }).join('');
+    }
+
+    document.querySelector('#highlight').onclick = () => {
+      const preview = document.querySelector('#syntax-preview');
+      preview.hidden = !preview.hidden;
+      editor.hidden = !preview.hidden;
+      if (!preview.hidden) {
+        preview.innerHTML = highlightPython(editor.value);
+        document.querySelector('#highlight').textContent = 'Edit';
+      } else {
+        document.querySelector('#highlight').textContent = 'Highlight';
+      }
+    };
+
+    document.querySelector('#lint').onclick = async () => {
+      const entry = openFiles.get(activeFile);
+      if (!entry) return showNotice('No file open', 'Open a Python file before linting.');
+      try {
+        const result = await requestJson(API + '/api/lint', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: entry.code })
+        }, 'Lint');
+        if (result.valid) await showNotice('Lint passed', 'No syntax errors found.');
+        else await showNotice('Lint errors', result.errors.map(error => `Line ${error.line}, column ${error.column}: ${error.message}`).join('\n'));
+      } catch (error) {
+        await showRetry('Lint failed', error.message, () => document.querySelector('#lint').click());
+      }
+    };
+
+    document.querySelector('#format').onclick = async () => {
+      const entry = openFiles.get(activeFile);
+      if (!entry) return showNotice('No file open', 'Open a Python file before formatting.');
+      try {
+        const result = await requestJson(API + '/api/format', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: entry.code })
+        }, 'Format');
+        entry.code = result.code;
+        entry.kind = entry.kind === 'added' ? 'added' : 'modified';
+        syncActiveFile();
+        persistWorkspace();
+        await showNotice('Formatted', 'Python syntax formatting applied.');
+      } catch (error) {
+        await showRetry('Format failed', error.message, () => document.querySelector('#format').click());
+      }
+    };
+
+    document.querySelector('#find').onclick = async () => {
+      const query = await openModal({ title: 'Find in current file', message: 'Enter text to select the next match.', input: true, confirmText: 'Find' });
+      if (!query) return;
+      const start = editor.value.indexOf(query, editor.selectionEnd);
+      const found = start >= 0 ? start : editor.value.indexOf(query);
+      if (found < 0) return showNotice('Not found', `${query} was not found in this file.`);
+      editor.focus();
+      editor.setSelectionRange(found, found + query.length);
+      editor.scrollTop = Math.max(0, (editor.value.slice(0, found).split('\n').length - 5) * 23);
+    };
+
+    document.querySelector('#share').onclick = async () => {
+      const entry = openFiles.get(activeFile);
+      if (!entry) return showNotice('No file open', 'Open a file before sharing.');
+      const payload = JSON.stringify({ name: entry.name, code: entry.code });
+      const encoded = btoa(unescape(encodeURIComponent(payload)));
+      history.replaceState(null, '', `#code=${encodeURIComponent(encoded)}`);
+      await navigator.clipboard?.writeText(location.href);
+      await showNotice('Share link created', 'The link is in the address bar and was copied to the clipboard when available.');
+    };
+
+    document.querySelector('#copy-output').onclick = async () => {
+      const entry = openFiles.get(activeFile);
+      if (!entry?.output) return showNotice('No output', 'Run the current file before copying output.');
+      await navigator.clipboard.writeText(entry.output);
+      await showNotice('Output copied', 'The output was copied to the clipboard.');
+    };
 
     document.querySelector('#run').onclick = runCode;
     document.querySelector('#save').onclick = savePullRequest;
@@ -686,6 +878,7 @@
       if (entry) { entry.code = editor.value; if (entry.kind === 'unchanged') entry.kind = 'modified'; entry.status = 'Unsaved changes'; }
       updateLineNumbers();
       updateSuggestions();
+      persistWorkspace();
     });
     editor.addEventListener('scroll', () => { lineNumbers.scrollTop = editor.scrollTop; });
     editor.addEventListener('blur', () => setTimeout(hideSuggestions, 120));
@@ -708,7 +901,19 @@
     makeResizable(document.querySelector('#output-resizer'), 'y', (initial, delta) => {
       document.documentElement.style.setProperty('--output-height', `${Math.max(120, Math.min(420, initial - delta))}px`);
     });
-    loadFiles().catch(error => { setStatus('Repository unavailable'); showRetry('Could not load files', error.message, loadFiles); });
+    function updateOnlineState() {
+      const indicator = document.querySelector('#online-state');
+      indicator.textContent = navigator.onLine ? 'Online' : 'Offline';
+      indicator.classList.toggle('offline', !navigator.onLine);
+    }
+    window.addEventListener('online', updateOnlineState);
+    window.addEventListener('offline', updateOnlineState);
+    updateOnlineState();
+    loadFiles().catch(error => {
+      setStatus('Offline workspace');
+      restoreWorkspace();
+      if (!openFiles.size) showRetry('Could not load files', error.message, loadFiles);
+    });
   </script>
 </body>
 </html>
